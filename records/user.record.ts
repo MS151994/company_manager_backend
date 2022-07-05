@@ -12,6 +12,7 @@ export class UserRecord implements UserInterface {
     password: string;
     isAdmin: boolean;
     createdAt: Date;
+    ivHex: string;
 
     constructor(obj: NewUser) {
         if (!obj.name || obj.name.length > 100) {
@@ -25,6 +26,7 @@ export class UserRecord implements UserInterface {
         this.password = obj.password;
         this.isAdmin = obj.isAdmin;
         this.createdAt = obj.createdAt;
+        this.ivHex = obj.ivHex;
     }
 
     static async getUser(name: string): Promise<UserInterface> {
@@ -42,7 +44,7 @@ export class UserRecord implements UserInterface {
         } else {
             throw new ValidationError('Cannot insert something that is already inserted!');
         }
-        await pool.execute("INSERT INTO `users` (`id`,`name`,`password`,`isAdmin`) VALUES (:id,:name,:password,:isAdmin)", this);
+        await pool.execute("INSERT INTO `users` (`id`,`name`,`password`,`isAdmin`,`ivHex`) VALUES(:id,:name,:password,:isAdmin,:ivHex)", this);
     }
 }
 

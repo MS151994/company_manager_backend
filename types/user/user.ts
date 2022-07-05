@@ -8,5 +8,6 @@ export interface UserInterface {
     password: string;
     isAdmin: boolean;
     createdAt: Date;
+    ivHex: string;
 }
 

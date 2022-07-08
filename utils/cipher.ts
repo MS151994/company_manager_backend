@@ -14,7 +14,7 @@ export async function encryptText(text: string, password: string, salt: string) 
     encrypted += cipher.final('hex');
     return {
         encrypted,
-        iv: iv.toString('hex'),
+        iv: iv.toString('hex') as string,
     };
 }
 

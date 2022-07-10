@@ -8,11 +8,6 @@ export const NotesRouter = Router()
         res.json(notes);
     })
 
-    .get('/one', async (req, res) => {
-        const note = await NotesRecord.getOneNote('fbaf63c1-fe30-11ec-bf98-d45d6482d051');
-        res.json({message: 'ok'})
-    })
-
     .post('/', async (req, res) => {
         const newNote = await new NotesRecord({
             ...req.body,
@@ -34,7 +29,6 @@ export const NotesRouter = Router()
             text: req.body.text,
             isImportant: req.body.isImportant,
         })
-        console.log(updateNote)
        await updateNote.updateAll()
         res.json({message: 'ok'})
     })

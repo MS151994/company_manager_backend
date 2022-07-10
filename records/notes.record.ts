@@ -1,4 +1,4 @@
-import {NewNote, NotesInterface} from "../types/notes";
+import {NewNote, NotesInterface} from "../types";
 import {ValidationError} from "../utils/errors";
 import {pool} from "../utils/db";
 import {FieldPacket} from "mysql2";
@@ -36,7 +36,7 @@ export class NotesRecord implements NotesInterface {
         } else {
             throw new ValidationError('Cannot insert something that is already inserted!')
         }
-        await pool.execute("INSERT INTO `notes` (`id`,`title`,`text`,`userId`) VALUES(:id,:title,:text,:userId)", this)
+        await pool.execute("INSERT INTO `notes` (`id`,`title`,`text`,`userId`,`isImportant`)VALUES(:id,:title,:text,:userId,:isImportant)", this)
     }
 
     static async getAllUserNotes(userId: string): Promise<NotesInterface[]> {
@@ -51,6 +51,17 @@ export class NotesRecord implements NotesInterface {
             id,
         }) as NewNotesType;
         return result.length === 0 ? null : new NotesRecord(result[0]);
+    }
+
+    static async update(id: string, isImportant: string): Promise<void> {
+        await pool.execute("UPDATE `notes` SET `isImportant`=:isImportant WHERE  `id`=:id", {
+            id,
+            isImportant,
+        });
+    }
+
+    async updateAll(): Promise<void> {
+        await pool.execute("UPDATE `notes` SET `title`=:title,`text`=:text, `isImportant`=:isImportant WHERE`id`=:id", this);
     }
 
     static async deleteNote(id: string): Promise<void> {

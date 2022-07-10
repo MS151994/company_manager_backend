@@ -3,9 +3,8 @@ import {NotesRecord} from "../records/notes.record";
 
 export const NotesRouter = Router()
 
-    .get('/', async (req, res) => {
-        const notes = await NotesRecord.getAllUserNotes('6169e714-65cc-41e8-b6aa-709df1773cb4');
-        console.log(notes);
+    .get('/:id', async (req, res) => {
+        const notes = await NotesRecord.getAllUserNotes(req.params.id);
         res.json(notes);
     })
 

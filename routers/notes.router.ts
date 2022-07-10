@@ -10,11 +10,36 @@ export const NotesRouter = Router()
 
     .get('/one', async (req, res) => {
         const note = await NotesRecord.getOneNote('fbaf63c1-fe30-11ec-bf98-d45d6482d051');
-        console.log(note);
         res.json({message: 'ok'})
     })
 
-    .delete('/', async (req, res) => {
-        await NotesRecord.deleteNote("64c561ec-fe2c-11ec-bf98-d45d6482d051");
+    .post('/', async (req, res) => {
+        const newNote = await new NotesRecord({
+            ...req.body,
+            createdAt: new Date(),
+        });
+        await newNote.insertNote();
+        res.json({message: "added"});
+    })
+
+    .patch('/one/:id', async (req, res) => {
+        await NotesRecord.update(req.params.id, req.body.isImportant);
+        res.json({message: 'ok'});
+    })
+    .put('/edit/:id', async (req, res) => {
+        const note = await NotesRecord.getOneNote(req.params.id);
+        const updateNote = await new NotesRecord({
+            ...note,
+            title: req.body.title,
+            text: req.body.text,
+            isImportant: req.body.isImportant,
+        })
+        console.log(updateNote)
+       await updateNote.updateAll()
+        res.json({message: 'ok'})
+    })
+
+    .delete('/:id', async (req, res) => {
+        await NotesRecord.deleteNote(req.params.id);
         res.json({message: 'ok'});
     })

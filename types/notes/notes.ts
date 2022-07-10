@@ -8,4 +8,5 @@ export interface NotesInterface {
     text: string;
     createdAt: Date;
     userId: string | null;
+    isImportant: boolean;
 }

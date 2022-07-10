@@ -12,6 +12,7 @@ export class NotesRecord implements NotesInterface {
     text: string;
     createdAt: Date;
     userId: string | null;
+    isImportant: boolean;
 
     constructor(obj: NewNote) {
         if (!obj.title || obj.title.length > 30) {
@@ -26,6 +27,7 @@ export class NotesRecord implements NotesInterface {
         this.text = obj.text;
         this.createdAt = obj.createdAt;
         this.userId = obj.userId;
+        this.isImportant = obj.isImportant;
     }
 
     async insertNote(): Promise<void> {

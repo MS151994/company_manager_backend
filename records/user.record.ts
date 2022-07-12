@@ -36,6 +36,11 @@ export class UserRecord implements UserInterface {
         return result.length === 0 ? null : new UserRecord(result[0]);
     }
 
+    static async getAllUser(): Promise<UserInterface[]> {
+        const [results] = await pool.execute("SELECT * FROM `users`") as AdNewUser;
+        return results.map(user => new UserRecord(user));
+    }
+
     async insertUser(): Promise<void> {
         this.isAdmin = false;
         if (!this.id) {

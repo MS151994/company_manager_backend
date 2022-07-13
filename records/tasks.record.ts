@@ -2,6 +2,7 @@ import {NewTask, TaskInterface} from "../types";
 import {ValidationError} from "../utils/errors";
 import {pool} from "../utils/db";
 import {FieldPacket} from "mysql2";
+import {v4 as uuid} from "uuid";
 
 type NewTaskType = [TaskInterface[], FieldPacket[]];
 
@@ -48,5 +49,28 @@ export class TasksRecord implements TaskInterface {
     static async getAllTask(): Promise<TaskInterface[]> {
         const [results] = await pool.execute("SELECT * FROM `tasks`") as NewTaskType;
         return results.map(task => new TasksRecord(task));
+    }
+
+    static async getOneTask(id: string): Promise<TaskInterface> {
+        const [result] = await pool.execute("SELECT * FROM `tasks` WHERE `id`=:id", {
+            id,
+        }) as NewTaskType;
+        return result.length === 0 ? null : new TasksRecord(result[0]);
+    }
+
+    async insetTask(): Promise<void> {
+        if (!this.id) {
+            this.id = uuid();
+        } else {
+            throw new ValidationError('Cannot insert something that is already inserted!')
+        }
+        await pool.execute("INSERT INTO `tasks` (`id`,`title`,`text`,`nip`,`telNumber`,`isDone`,`createdAt`,`deadline`,`userId`) VALUES (:id,:title,:text,:nip,:telNumber,:isDone,:createdAt,:deadline,:userId)", this)
+    }
+
+    static async updateUser(id: string, userId: string): Promise<void> {
+        await pool.execute("UPDATE `tasks` SET `userId`=:userId WHERE `id`=:id", {
+            id,
+            userId,
+        });
     }
 }

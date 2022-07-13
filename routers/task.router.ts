@@ -1,6 +1,7 @@
 import {Router} from "express";
 import {TasksRecord} from "../records/tasks.record";
 import {UserRecord} from "../records/user.record";
+import {TodosRecord} from "../records/todos.record";
 
 export const TaskRouter = Router()
 
@@ -23,8 +24,26 @@ export const TaskRouter = Router()
     })
 
     .patch('/one/:taskId', async (req, res) => {
-        console.log(req.params.taskId);
-        console.log("user:", req.body.userId)
         await TasksRecord.updateUser(req.params.taskId, req.body.userId);
+        const createTodo = await new TodosRecord({
+            title: req.body.title,
+            text: req.body.text,
+            createdAt: new Date(),
+            deadline: req.body.deadline,
+            highPriority: false,
+            userId: req.body.userId,
+            isActive: true,
+        })
+        await createTodo.insertTodo();
         res.json({message: 'ok'});
+    })
+
+    .patch('/isdone/:taskId', async (req, res) => {
+        await TasksRecord.updateIsDone(req.params.taskId, req.body.isDone);
+        res.json({message: 'setting'})
+    })
+
+    .delete('/:id', async (req, res) => {
+        await TasksRecord.delete(req.params.id);
+        res.json({message: 'deleted'})
     })

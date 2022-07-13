@@ -12,4 +12,5 @@ export interface TaskInterface {
     createdAt: Date;
     deadline: Date;
     userId: string | null;
+    status: string;
 }

@@ -16,6 +16,7 @@ export class TasksRecord implements TaskInterface {
     createdAt: Date;
     isDone: boolean | string;
     userId: string | null;
+    status: string;
 
 
     constructor(obj: NewTask) {
@@ -43,6 +44,7 @@ export class TasksRecord implements TaskInterface {
         this.createdAt = obj.createdAt;
         this.isDone = obj.isDone;
         this.userId = obj.userId;
+        this.status = obj.status;
 
     }
 
@@ -64,7 +66,7 @@ export class TasksRecord implements TaskInterface {
         } else {
             throw new ValidationError('Cannot insert something that is already inserted!')
         }
-        await pool.execute("INSERT INTO `tasks` (`id`,`title`,`text`,`nip`,`telNumber`,`isDone`,`createdAt`,`deadline`,`userId`) VALUES (:id,:title,:text,:nip,:telNumber,:isDone,:createdAt,:deadline,:userId)", this)
+        await pool.execute("INSERT INTO `tasks`(`id`,`title`,`text`,`nip`,`telNumber`,`isDone`,`createdAt`,`deadline`,`userId`,`status`) VALUES(:id,:title,:text,:nip,:telNumber,:isDone,:createdAt,:deadline,:userId,:status)", this)
     }
 
     static async updateUser(id: string, userId: string): Promise<void> {
@@ -72,5 +74,18 @@ export class TasksRecord implements TaskInterface {
             id,
             userId,
         });
+    }
+
+    static async updateIsDone(id: string, isDone: string): Promise<void> {
+        await pool.execute("UPDATE `tasks` SET `isDone`=:isDone WHERE `id`=:id", {
+            isDone,
+            id,
+        });
+    }
+
+    static async delete(id: string): Promise<void> {
+        await pool.execute("DELETE FROM `tasks` WHERE `id`=:id", {
+            id,
+        })
     }
 }

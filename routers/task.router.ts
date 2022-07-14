@@ -6,10 +6,15 @@ import {TodosRecord} from "../records/todos.record";
 export const TaskRouter = Router()
 
     .get('/', async (req, res) => {
-        const tasks = await TasksRecord.getAllTask();
+        const tasks = await TasksRecord.getAllTask("active");
         const users = await UserRecord.getAllUser();
         const simpleUserInfo = users.map(user => ({userId: user.id, name: user.name}));
         res.json([tasks, simpleUserInfo])
+    })
+
+    .get('/archive', async (req, res) => {
+        const archiveTasks = await TasksRecord.getAllTask("archive");
+        res.json(archiveTasks);
     })
 
     .post('/', async (req, res) => {
@@ -43,7 +48,12 @@ export const TaskRouter = Router()
         res.json({message: 'setting'})
     })
 
-    .delete('/:id', async (req, res) => {
+    .patch('/setarchive/:taskId', async (req, res) => {
+        await TasksRecord.updateSetArchive(req.params.taskId, req.body.status);
+        res.json({message: 'ok'});
+    })
+
+    .delete('/archive/:id', async (req, res) => {
         await TasksRecord.delete(req.params.id);
         res.json({message: 'deleted'})
     })

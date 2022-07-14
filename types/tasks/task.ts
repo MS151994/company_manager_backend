@@ -14,3 +14,9 @@ export interface TaskInterface {
     userId: string | null;
     status: string;
 }
+
+export interface SimpleInfoTask{
+    id: string;
+    title: string
+    text: string;
+}

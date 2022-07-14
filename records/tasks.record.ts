@@ -1,10 +1,11 @@
-import {NewTask, TaskInterface} from "../types";
+import {NewTask, SimpleInfoTask, TaskInterface} from "../types";
 import {ValidationError} from "../utils/errors";
 import {pool} from "../utils/db";
 import {FieldPacket} from "mysql2";
 import {v4 as uuid} from "uuid";
 
 type NewTaskType = [TaskInterface[], FieldPacket[]];
+type NewSimpleTaskType = [SimpleInfoTask[], FieldPacket[]];
 
 export class TasksRecord implements TaskInterface {
     id: string;
@@ -66,6 +67,7 @@ export class TasksRecord implements TaskInterface {
         } else {
             throw new ValidationError('Cannot insert something that is already inserted!')
         }
+        this.status = 'active';
         await pool.execute("INSERT INTO `tasks`(`id`,`title`,`text`,`nip`,`telNumber`,`isDone`,`createdAt`,`deadline`,`userId`,`status`) VALUES(:id,:title,:text,:nip,:telNumber,:isDone,:createdAt,:deadline,:userId,:status)", this)
     }
 
@@ -87,5 +89,13 @@ export class TasksRecord implements TaskInterface {
         await pool.execute("DELETE FROM `tasks` WHERE `id`=:id", {
             id,
         })
+    }
+
+    static async getAllSimpleInfoTask(id: string, deadline: string): Promise<SimpleInfoTask[]> {
+        const [results] = await pool.execute("SELECT `title`,`text`,`id` FROM `tasks` WHERE `deadline`=:deadline AND`userId`=:id AND`isDone`='0'", {
+            id,
+            deadline,
+        }) as NewSimpleTaskType;
+        return results;
     }
 }

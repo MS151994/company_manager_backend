@@ -56,6 +56,13 @@ export class TasksRecord implements TaskInterface {
         return results.map(task => new TasksRecord(task));
     }
 
+    static async searchTask(searchingValue: string): Promise<TaskInterface[]> {
+        const [results] = await pool.execute("SELECT * FROM `tasks` WHERE `nip`=:searchingValue", {
+            searchingValue,
+        }) as NewTaskType;
+        return results.map(task => new TasksRecord(task));
+    }
+
     static async getOneTask(id: string): Promise<TaskInterface> {
         const [result] = await pool.execute("SELECT * FROM `tasks` WHERE `id`=:id", {
             id,
@@ -115,4 +122,5 @@ export class TasksRecord implements TaskInterface {
         }) as NewSimpleTaskType;
         return results;
     }
+
 }

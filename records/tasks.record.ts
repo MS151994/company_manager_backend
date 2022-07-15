@@ -50,7 +50,7 @@ export class TasksRecord implements TaskInterface {
     }
 
     static async getAllTask(status: string): Promise<TaskInterface[]> {
-        const [results] = await pool.execute("SELECT * FROM `tasks` WHERE `status`=:status", {
+        const [results] = await pool.execute("SELECT * FROM `tasks` WHERE `status`=:status ORDER BY `isDone` ASC, `deadline` ASC, `userId` IS NULL", {
             status,
         }) as NewTaskType;
         return results.map(task => new TasksRecord(task));
@@ -107,18 +107,16 @@ export class TasksRecord implements TaskInterface {
         })
     }
 
-    static async getAllSimpleInfoTask(id: string, deadline: string): Promise<SimpleInfoTask[]> {
-        const [results] = await pool.execute("SELECT `title`,`text`,`id` FROM `tasks` WHERE `deadline`<=:deadline AND`userId`=:id AND`isDone`='0'", {
+    static async getAllSimpleInfoTask(id: string): Promise<SimpleInfoTask[]> {
+        const [results] = await pool.execute("SELECT `title`,`text`,`id` FROM `tasks` WHERE `userId`=:id AND`isDone`='0' ORDER BY `deadline` DESC", {
             id,
-            deadline,
         }) as NewSimpleTaskType;
         return results;
     }
 
-    static async getAllSimpleInfoNewTask(deadline: string): Promise<SimpleInfoTask[]> {
-        const [results] = await pool.execute("SELECT `title`,`text`,`id` FROM `tasks` WHERE `deadline`<=:deadline AND `userId` IS NULL AND`isDone`='0'", {
+    static async getAllSimpleInfoNewTask(): Promise<SimpleInfoTask[]> {
+        const [results] = await pool.execute("SELECT `title`,`text`,`id` FROM `tasks` WHERE `userId` IS NULL AND`isDone`='0' ORDER BY `deadline` DESC", {
             userId: "NULL",
-            deadline,
         }) as NewSimpleTaskType;
         return results;
     }

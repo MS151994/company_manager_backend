@@ -4,9 +4,8 @@ import {TasksRecord} from "../records/tasks.record";
 export const HomeRouter = Router()
 
     .get('/:userId', async (req, res) => {
-        const dt = new Date().toISOString().slice(0, 10);
-        const tasks = await TasksRecord.getAllSimpleInfoTask(req.params.userId, dt);
-        const newTasks = await TasksRecord.getAllSimpleInfoNewTask(dt);
+        const tasks = await TasksRecord.getAllSimpleInfoTask(req.params.userId);
+        const newTasks = await TasksRecord.getAllSimpleInfoNewTask();
         res.json([tasks, newTasks])
     })
 

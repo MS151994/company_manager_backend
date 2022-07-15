@@ -53,7 +53,7 @@ export const TaskRouter = Router()
         res.json({message: 'setting'})
     })
 
-    .delete('/:id', async (req, res) => {
+    .delete('/archive/:id', async (req, res) => {
         await TasksRecord.delete(req.params.id);
         res.json({message: 'deleted'})
     })

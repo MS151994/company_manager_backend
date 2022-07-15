@@ -50,10 +50,10 @@ export const TaskRouter = Router()
 
     .patch('/setarchive/:taskId', async (req, res) => {
         await TasksRecord.updateSetArchive(req.params.taskId, req.body.status);
-        res.json({message: 'ok'});
+        res.json({message: 'setting'})
     })
 
-    .delete('/archive/:id', async (req, res) => {
+    .delete('/:id', async (req, res) => {
         await TasksRecord.delete(req.params.id);
         res.json({message: 'deleted'})
     })

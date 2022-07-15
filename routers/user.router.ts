@@ -17,23 +17,37 @@ export const userRouter = Router()
                 ivHex: pass.iv,
             });
             await newUserRegister.insertUser();
-            res.json({message: 'added'})
+            res
+                .status(201)
+                .json({message: 'user added'})
         }
     })
 
     .post('/', async (req, res) => {
-        const data = await UserRecord.getUser(req.body.name);
-        let userPassMatch;
-        if (!data) {
-            userPassMatch = '';
-            res.json({message: "user not found"});
-        } else {
-            userPassMatch = await decryptText(data.password, req.body.password, salt, data.ivHex);
-            const simpleUserInfo = {
-                name: data.name,
-                id: data.id,
+        const user = await UserRecord.getUser(req.body.name);
+        if (user) {
+            try {
+                const decryptPass = await decryptText(user.password, req.body.password, salt, user.ivHex);
+                if (decryptPass === req.body.password) {
+                    const simpleUserInfo = {
+                        name: user.name,
+                        id: user.id,
+                    }
+                    res
+                        .status(200)
+                        .json(simpleUserInfo)
+                }
+            } catch (err) {
+                if (err) {
+                    res
+                        .status(401)
+                        .json({message: 'login attempt'})
+                }
             }
-            res.json(userPassMatch === req.body.password ? simpleUserInfo : {message: 'login attempt'});
+        } else {
+            res
+                .status(404)
+                .json({message: 'user not found!'})
         }
     })
 

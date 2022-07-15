@@ -107,4 +107,12 @@ export class TasksRecord implements TaskInterface {
         }) as NewSimpleTaskType;
         return results;
     }
+
+    static async getAllSimpleInfoNewTask(deadline: string): Promise<SimpleInfoTask[]> {
+        const [results] = await pool.execute("SELECT `title`,`text`,`id` FROM `tasks` WHERE `deadline`<=:deadline AND `userId` IS NULL AND`isDone`='0'", {
+            userId: "NULL",
+            deadline,
+        }) as NewSimpleTaskType;
+        return results;
+    }
 }

@@ -77,13 +77,48 @@ export const userRouter = Router()
             .json(simpleUserInfo)
     })
 
-    .patch('/user', async (req, res) => {
+    .patch('/user/changestatus', async (req, res) => {
         const user = await UserRecord.getOneUser(req.body.userId);
         const updatedUserStatus = await new UserRecord({
             ...user,
             userStatus: req.body.userStatus,
         })
         await updatedUserStatus.update();
-        res.status(200);
+        res
+            .status(200)
+            .json({message: 'updated'})
+    })
+
+    .patch('/user/changepassword', async (req, res) => {
+        const user = await UserRecord.getOneUser(req.body.userId)
+        if (user) {
+            try {
+                const decryptPass = await decryptText(user.password, req.body.oldPass, salt, user.ivHex);
+                if (decryptPass === req.body.oldPass) {
+                    const newPass = await encryptText(req.body.newPass, req.body.newPass, salt);
+                    const updateUserPassword = new UserRecord({
+                        ...user,
+                        password: newPass.encrypted,
+                        ivHex: newPass.iv,
+                    })
+                    await updateUserPassword.update()
+                    res
+                        .status(200)
+                        .json({message: 'password updated'})
+
+                }
+            } catch (err) {
+                if (err) {
+                    res
+                        .status(401)
+                        .json({message: 'bad old pass'})
+                }
+            }
+        } else {
+            res
+                .status(404)
+                .json({message: 'user not found!'})
+        }
+
     })
 

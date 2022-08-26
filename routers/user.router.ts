@@ -2,6 +2,9 @@ import {Router} from "express";
 import {UserRecord} from "../records/user.record";
 import {decryptText, encryptText} from "../utils/cipher";
 import {salt} from "../config/config";
+import {TasksRecord} from "../records/tasks.record";
+import {NotesRecord} from "../records/notes.record";
+import {TodosRecord} from "../records/todos.record";
 
 export const userRouter = Router()
 
@@ -15,6 +18,7 @@ export const userRouter = Router()
                 ...req.body,
                 password: pass.encrypted,
                 ivHex: pass.iv,
+                userRole: 'employer',
             });
             await newUserRegister.insertUser();
             res
@@ -32,6 +36,7 @@ export const userRouter = Router()
                     const simpleUserInfo = {
                         name: user.name,
                         id: user.id,
+                        userRole: user.userRole
                     }
                     res
                         .status(200)
@@ -49,5 +54,36 @@ export const userRouter = Router()
                 .status(404)
                 .json({message: 'user not found!'})
         }
+    })
+
+    .get('/user/:userId', async (req, res) => {
+        const user = await UserRecord.getOneUser(req.params.userId);
+        const taskLength = await TasksRecord.getAllSimpleInfoTask(req.params.userId)
+        const notesLength = await NotesRecord.getAllUserNotes(req.params.userId)
+        const todosLength = await TodosRecord.getAllUserTodos(req.params.userId)
+        const archiveLength = await TasksRecord.getAllTaskByUser('archive', req.params.userId)
+        const simpleUserInfo = {
+            id: user.id,
+            createdAt: user.createdAt,
+            userRole: user.userRole,
+            userStatus: user.userStatus,
+            taskLength: taskLength.length,
+            notesLength: notesLength.length,
+            todosLength: todosLength.length,
+            archiveLength: archiveLength.length
+        }
+        res
+            .status(200)
+            .json(simpleUserInfo)
+    })
+
+    .patch('/user', async (req, res) => {
+        const user = await UserRecord.getOneUser(req.body.userId);
+        const updatedUserStatus = await new UserRecord({
+            ...user,
+            userStatus: req.body.userStatus,
+        })
+        await updatedUserStatus.update();
+        res.status(200);
     })
 

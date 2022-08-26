@@ -56,6 +56,14 @@ export class TasksRecord implements TaskInterface {
         return results.map(task => new TasksRecord(task));
     }
 
+    static async getAllTaskByUser(status: string, userId: string): Promise<TaskInterface[]> {
+        const [results] = await pool.execute("SELECT * FROM `tasks` WHERE `status`=:status AND `userId`=:userId ORDER BY `isDone` ASC, `deadline` ASC, `userId` IS NULL", {
+            status,
+            userId,
+        }) as NewTaskType;
+        return results.map(task => new TasksRecord(task));
+    }
+
     static async searchTask(searchingValue: string): Promise<TaskInterface[]> {
         const [results] = await pool.execute("SELECT * FROM `tasks` WHERE `nip`=:searchingValue", {
             searchingValue,

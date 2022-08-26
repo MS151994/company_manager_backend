@@ -6,8 +6,9 @@ export interface UserInterface {
     id: string;
     name: string;
     password: string;
-    isAdmin: boolean;
     createdAt: Date;
     ivHex: string;
+    userRole: string;
+    userStatus: string;
 }
 

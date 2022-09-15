@@ -18,7 +18,7 @@ export const userRouter = Router()
                 ...req.body,
                 password: pass.encrypted,
                 ivHex: pass.iv,
-                userRole: 'employer',
+                userRole: req.body.userRole ?? 'employer',
             });
             await newUserRegister.insertUser();
             res
@@ -54,6 +54,11 @@ export const userRouter = Router()
                 .status(404)
                 .json({message: 'user not found!'})
         }
+    })
+
+    .get('/user/getalluser', async (req, res) => {
+        const users = await UserRecord.getAllUser()
+        res.json(users)
     })
 
     .get('/user/:userId', async (req, res) => {
@@ -119,6 +124,5 @@ export const userRouter = Router()
                 .status(404)
                 .json({message: 'user not found!'})
         }
-
     })
 

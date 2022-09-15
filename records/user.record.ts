@@ -32,7 +32,7 @@ export class UserRecord implements UserInterface {
     }
 
     static async getUser(name: string): Promise<UserInterface> {
-        const [result] = await pool.execute("SELECT * FROM `users` WHERE name=:name", {
+        const [result] = await pool.execute('SELECT * FROM `users` WHERE name=:name', {
             name,
         }) as AdNewUser;
         return result.length === 0 ? null : new UserRecord(result[0]);
@@ -64,5 +64,7 @@ export class UserRecord implements UserInterface {
         }
         await pool.execute("INSERT INTO `users`(`id`,`name`,`password`,`ivHex`,`userRole`,`userStatus`) VALUES(:id,:name,:password,:ivHex,:userRole,:userStatus)", this);
     }
+
+
 }
 
